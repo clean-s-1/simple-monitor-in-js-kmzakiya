@@ -19,18 +19,24 @@ function printBreach(deviationFromMin, deviationFromMax, name, battery) {
   );
 }
 
-function batteryIsOk(battery, bmsConfig) {
+function checkIfPropertyInRange(key, battery, bmsConfig) {
   let isInRange = true;
-  for (let key in bmsConfig) {
-    const config = bmsConfig[key];
-    const deviationFromMin = getDeviationFromMin(config.min, battery[key]);
-    const deviationFromMax = getDeviationFromMax(config.max, battery[key]);
-    if (deviationFromMin || deviationFromMax) {
-      isInRange = false;
-      printBreach(deviationFromMin, deviationFromMax, config.name, battery);
-    }
+  const config = bmsConfig[key];
+  const deviationFromMin = getDeviationFromMin(config.min, battery[key]);
+  const deviationFromMax = getDeviationFromMax(config.max, battery[key]);
+  if (deviationFromMin || deviationFromMax) {
+    isInRange = false;
+    printBreach(deviationFromMin, deviationFromMax, config.name, battery);
   }
   return isInRange;
+}
+
+function batteryIsOk(battery, bmsConfig) {
+  return (
+    checkIfPropertyInRange("temperature", battery, bmsConfig) &&
+    checkIfPropertyInRange("stateOfCharge", battery, bmsConfig) &&
+    checkIfPropertyInRange("chargeRate", battery, bmsConfig)
+  );
 }
 
 expect(batteryIsOk(new Battery(0, 70, 0.7), BMS_CONFIG)).to.be.true;
