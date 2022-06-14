@@ -13,29 +13,25 @@ function getDeviationFromMax(max, value) {
 function printBreach(deviationFromMin, deviationFromMax, name, battery) {
   const breach = deviationFromMin || deviationFromMax;
   console.log(
-    `${name} is ${
-      deviationFromMin ? "LOW" : "HIGH"
-    } by ${breach} - ${battery.toString()}`
+    `${name} is ${deviationFromMin ? "LOW" : "HIGH"} by ${breach} - ${battery.toString()}`
   );
 }
 
-function checkIfPropertyInRange(key, battery, bmsConfig) {
-  let isInRange = true;
-  const config = bmsConfig[key];
+function checkIfPropertyInRange(key, battery, config) {
   const deviationFromMin = getDeviationFromMin(config.min, battery[key]);
   const deviationFromMax = getDeviationFromMax(config.max, battery[key]);
   if (deviationFromMin || deviationFromMax) {
-    isInRange = false;
     printBreach(deviationFromMin, deviationFromMax, config.name, battery);
+    return false;
   }
-  return isInRange;
+  return true;
 }
 
 function batteryIsOk(battery, bmsConfig) {
   return (
-    checkIfPropertyInRange("temperature", battery, bmsConfig) &&
-    checkIfPropertyInRange("stateOfCharge", battery, bmsConfig) &&
-    checkIfPropertyInRange("chargeRate", battery, bmsConfig)
+    checkIfPropertyInRange("temperature", battery, bmsConfig.temperature) &&
+    checkIfPropertyInRange("stateOfCharge", battery, bmsConfig.stateOfCharge) &&
+    checkIfPropertyInRange("chargeRate", battery, bmsConfig.chargeRate)
   );
 }
 
